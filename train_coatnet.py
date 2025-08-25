@@ -280,6 +280,13 @@ def main():
     np.random.seed(args.seed)
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
+
+    if device == "cuda":
+        print(f"[Device] Using CUDA: {torch.cuda.get_device_name(0)} (count={torch.cuda.device_count()})")
+        print(f"[Device] CUDA runtime: {torch.version.cuda}, cuDNN: {torch.backends.cudnn.version()}")
+    else:
+        print("[Device] Using CPU")
+
     out_dir = Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -346,6 +353,10 @@ def main():
             num_classes=num_classes,
             in_chans=3  # we convert PNGs to RGB
         )
+
+        model = model.to(device)
+        print(f"[Device] Model parameters are on: {next(model.parameters()).device}")
+    
     else:
         print("[WARN] timm not found. Using TinyHybridNet fallback.")
         model = TinyHybridNet(num_classes=num_classes, in_chans=3)
